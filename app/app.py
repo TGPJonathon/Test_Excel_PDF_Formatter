@@ -35,6 +35,7 @@ def before_first_request_func():
 
   # Will iterate through immediate directory to check
   for dir in os.listdir():
+    print(dir)
     if(dir.startswith("jdk")):
       is_java_installed = True
 
@@ -42,11 +43,12 @@ def before_first_request_func():
   if(not is_java_installed):
     jdk.install('11', jre=True, path="./")
 
+  print(is_java_installed)
   #Set location of Java installation
-  os.environ["JAVA_HOME"] = "./"
+  # os.environ["JAVA_HOME"] = "./"
 
   #Start Java Virtual Machine
-  jpype.startJVM()
+  jpype.startJVM("jdk-11.0.13+8-jre/bin/server")
 
 
 
@@ -141,5 +143,5 @@ def after_request_func(response):
 
 
 
-if __name__ == '__main__':
-  app.run()
+# if __name__ == '__main__':
+#   app.run()
