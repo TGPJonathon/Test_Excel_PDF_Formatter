@@ -149,7 +149,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         'bold': True,
         'text_wrap': True,
         'font_name': 'Arial',
-        'font_size': 10,
+        'font_size': 9,
         'valign': 'bottom',
         'align': 'center',
         'fg_color': '#E2EFDA', # Fill color hex code

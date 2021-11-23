@@ -55,7 +55,6 @@ def before_first_request_func():
 #####################################################
 
 
-
 @app.route("/", methods=["POST"])
 def send_excel():
 
@@ -73,7 +72,7 @@ def send_excel():
   excel_sheet_title = request.get_json().get('excelFormattingParameters')[0]['excelTitle']
   pdf_or_no = request.get_json().get('excelFormattingParameters')[0]['pdf']
 
-  output = make_excel_sheet(g.get("title"), excel_data, highlight_rows, column_widths, excel_sheet_title, pdf_or_no)
+  output = make_excel_sheet(g.get('title'), excel_data, highlight_rows, column_widths, excel_sheet_title, pdf_or_no)
 
 #####################################################
 #      End
@@ -92,7 +91,7 @@ def send_excel():
   if(output == 0):
     
     #asposeCells package will open the created excel sheet based on the title
-    workbook = Workbook(g.get("title") + ".xlsx")
+    workbook = Workbook(g.get('title') + ".xlsx")
 
     #Converts the excel book to a PDF
     workbook.save("xlsx-to-pdf.pdf", SaveFormat.PDF)
@@ -127,11 +126,13 @@ def after_request_func(response):
     # Cannot remove the xlsx-to-pdf-cropped.pdf file because the response hasn't fully ended so the file wouldn't be sent
     # Might be okay though, since the file gets overwritten each api call
     def process_after_request():
+
       if os.path.isfile("xlsx-to-pdf.pdf"):
         os.remove("xlsx-to-pdf.pdf")
       
-      if os.path.isfile(g.get("title") + ".xlsx"):
-        os.remove(g.get("title") + ".xlsx")
+      if(g.get("title")):
+        if os.path.isfile(g.get("title") + ".xlsx"):
+          os.remove(g.get("title") + ".xlsx")
 
     # Will call function at end of request
     close.call_on_close(process_after_request())
