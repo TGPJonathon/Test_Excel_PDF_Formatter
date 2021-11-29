@@ -28,33 +28,36 @@ def before_first_request_func():
 
 ##################################################################
 #          Install Java Since it's Needed to Convert Excel to PDF
+
+#          *********IMPORTANT************
+#           Only for Local Testing Purposes
+#           Won't need when Containerized
 ##################################################################
 
-  # Check to see if Java is installed
-  is_java_installed = False
+  # # Check to see if Java is installed
+  # is_java_installed = False
 
-  # Will iterate through immediate directory to check
-  for dir in os.listdir():
-    print(dir)
-    if(dir.startswith("jdk")):
-      is_java_installed = True
+  # # Will iterate through immediate directory to check
+  # for dir in os.listdir():
+  #   print(dir)
+  #   if(dir.startswith("jdk")):
+  #     is_java_installed = True
 
-  # If not there, install it
-  if(not is_java_installed):
-    jdk.install('11', jre=True, path="./")
+  # # If not there, install it
+  # if(not is_java_installed):
+  #   jdk.install('11', path="./")
 
-  print(is_java_installed)
+  # print(is_java_installed)
   #Set location of Java installation
   # os.environ["JAVA_HOME"] = "./"
 
-  #Start Java Virtual Machine
-  jpype.startJVM("jdk-11.0.13+8-jre/bin/server")
-
-
-
 #####################################################
-#      End Java Install
+#      End Java Install / Local Testing
 #####################################################
+
+  # Start Java Virtual Machine
+  # Needed in Container
+  jpype.startJVM()
 
 
 @app.route("/", methods=["POST"])

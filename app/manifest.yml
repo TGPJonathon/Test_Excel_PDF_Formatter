@@ -1,0 +1,4 @@
+---
+applications:
+  - name: excel-pdf-formatter
+    memory: 128M
