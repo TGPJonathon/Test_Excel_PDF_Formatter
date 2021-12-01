@@ -361,7 +361,6 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         output.seek(0)
         return output
     else:
-    #Else return 0
         return 0
 
 

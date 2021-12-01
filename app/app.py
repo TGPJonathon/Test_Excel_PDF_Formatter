@@ -1,11 +1,14 @@
 from flask import Flask, request, send_file, Response, g
+from convert_to_pdf import convert_to_pdf
+from flask_healthz import healthz
 from flask_cors import CORS
 from excel_formatter import make_excel_sheet
-from crop_pdf import crop_pdf
+from io import BytesIO
+from convert_to_pdf import convert_to_pdf
+from readiness_liveness import liveness, readiness
 
 import jpype
 import jdk
-import asposecells
 import os
 
 """
@@ -17,6 +20,7 @@ Based on contents of POST request sent from UI
 
 # Create Flask App
 app = Flask(__name__)
+app.register_blueprint(healthz, url_prefix='/healthz')
 
 # Used to get around CORS for browsers
 CORS(app)
@@ -39,7 +43,6 @@ def before_first_request_func():
 
   # # Will iterate through immediate directory to check
   # for dir in os.listdir():
-  #   print(dir)
   #   if(dir.startswith("jdk")):
   #     is_java_installed = True
 
@@ -60,60 +63,33 @@ def before_first_request_func():
   jpype.startJVM()
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET","POST"])
 def send_excel():
+  if request.method == "GET":
+    return "TESTING HTTPS"
+  else:
 
-#####################################################
-#      Parameters determine format of Excel sheet
-#####################################################
-  
-  excel_data = request.get_json().get('data')
+#  Parameters determine format of Excel sheet
+    excel_data = request.get_json().get('data')
 
-  # g module allows variables to accessed globally within the same response
-  # Doesn't function like a normal Global
-  g.title = request.get_json().get('excelFormattingParameters')[0]['fileTitle']
-  highlight_rows = request.get_json().get('excelFormattingParameters')[0]['highlight']
-  column_widths = request.get_json().get('excelFormattingParameters')[0]['widths']
-  excel_sheet_title = request.get_json().get('excelFormattingParameters')[0]['excelTitle']
-  pdf_or_no = request.get_json().get('excelFormattingParameters')[0]['pdf']
+    # g module allows variables to accessed globally within the same response
+    # Doesn't function like a normal Global
+    g.title = request.get_json().get('excelFormattingParameters')[0]['fileTitle']
+    highlight_rows = request.get_json().get('excelFormattingParameters')[0]['highlight']
+    column_widths = request.get_json().get('excelFormattingParameters')[0]['widths']
+    excel_sheet_title = request.get_json().get('excelFormattingParameters')[0]['excelTitle']
+    pdf_or_no = request.get_json().get('excelFormattingParameters')[0]['pdf']
 
-  output = make_excel_sheet(g.get('title'), excel_data, highlight_rows, column_widths, excel_sheet_title, pdf_or_no)
+    output = make_excel_sheet(g.get('title'), excel_data, highlight_rows, column_widths, excel_sheet_title, pdf_or_no)
 
-#####################################################
-#      End
-#####################################################
-
-
-#####################################################
-#      Start Excel Conversion to PDF
-#####################################################
-
-  #Package only works with Java
-  from asposecells.api import SaveFormat, Workbook   
 
   # If the user wants a PDF the make_excel_sheet function will return 0 as a value
-  # make_excel_sheet will create a xlsx file in the local directory in that case
   if(output == 0):
-    
-    #asposeCells package will open the created excel sheet based on the title
-    workbook = Workbook(g.get('title') + ".xlsx")
-
-    #Converts the excel book to a PDF
-    workbook.save("xlsx-to-pdf.pdf", SaveFormat.PDF)
-
-    #aspose_cells package puts a red banner at the top of each Excel page
-    #this function will crop it out of each page
-    crop_pdf("xlsx-to-pdf.pdf")
-
-#####################################################
-#      End
-#####################################################
-
-
+    return_data = convert_to_pdf(g.get("title"))
 
   #Sends the file as a response to the browser to be downloaded
   #download_name has to be set even though it won't be used, the browser will normally handle the name of the file
-  return send_file(output if output != 0 else "xlsx-to-pdf-cropped.pdf", download_name="not_needed.pdf" if output == 0 else "not_needed.xlsx", as_attachment=True)
+  return send_file(output if output != 0 else return_data, download_name="not_needed.pdf" if output == 0 else "not_needed.xlsx", as_attachment=True)
 
 
 @app.after_request
@@ -128,12 +104,13 @@ def after_request_func(response):
     close = Response("Testing")
 
     # Will perform some clean up of local files
-    # Cannot remove the xlsx-to-pdf-cropped.pdf file because the response hasn't fully ended so the file wouldn't be sent
-    # Might be okay though, since the file gets overwritten each api call
     def process_after_request():
 
       if os.path.isfile("xlsx-to-pdf.pdf"):
         os.remove("xlsx-to-pdf.pdf")
+      
+      if os.path.isfile("xlsx-to-pdf-cropped.pdf"):
+        os.remove("xlsx-to-pdf-cropped.pdf")
       
       if(g.get("title")):
         if os.path.isfile(g.get("title") + ".xlsx"):
@@ -145,6 +122,13 @@ def after_request_func(response):
     return response
 
 
+app.config.update(
+  HEALTHZ = {
+    "live": "app.liveness",
+    "ready": "app.readiness",
+  }
+)
+  
 
-# if __name__ == '__main__':
-#   app.run()
+if __name__ == '__main__':
+  app.run(host="0.0.0.0", ssl_context="adhoc")
