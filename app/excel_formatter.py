@@ -221,6 +221,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         'align': 'center',
         'fg_color':'#FCE4D6',
         'text_wrap': True,
+        'num_format': '#,##0',
         'right':1,
         'left': 1,
         'top':1,
@@ -233,6 +234,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         'font_size': 8,
         'align': 'center',
         'text_wrap': True,
+        'num_format': '#,##0',
         'right':1,
         'left': 1,
         'top':1,
@@ -241,11 +243,15 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
 
     # Write in the actual data
     # Traverse each row in the first column
+
+    # Array used to check if the row height needs to be changed
+    row_height = [1]
+
     for i in range(0, col1):
-        # Set each row height 
-        # worksheet.set_row(i + 4, 13.5) 
+
+        row_height.append(1)
+
         # Initialized value, will be multiplied by 11.25 depending on how wide cell content is
-        row_height = 1
         
         # Traverse each column of data
         for j in range(0, len(df.columns)):
@@ -254,7 +260,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             # Row height will later be adjusted depending on how long the text is
             if(type(df.iloc[i,j]) == str):
                 num_of_chars = len(df.iloc[i,j]) / 14
-                row_height = num_of_chars if num_of_chars > row_height else row_height     
+                row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]     
             
             # If the corresponding highlight indicator is true
             if df_highlight.iloc[i, 0] == True:
@@ -287,27 +293,20 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
                     # Use the format corresponding to the non-highlighted data
                     text_format2)
         # Will adjust row height if contents of row are longer than cell
-        worksheet.set_row(i + 4, 11.25 * row_height if row_height % 1 == 0 else 11.25 * math.ceil(row_height))
-            
-            
-                
+        worksheet.set_row(i + 4, 11.25 * row_height[i] if row_height[i] % 1 == 0 else 11.25 * math.ceil(row_height[i]))          
                 
                 
     # If a second column exists
     if col2 != 0:
         
-        # Traverse data that will be in column 2
+        # Traverse row data that will be in column 2
         for i in range(0, col2):
-            row_height = 1
-            
-            # Again, set the row height
-            # worksheet.set_row(i + 4, 13.5) 
             
             # Traverse each column of data
             for j in range(0, len(df.columns)):
-                if(type(df.iloc[i,j]) == str):
-                    num_of_chars = len(df.iloc[i,j]) / 14
-                    row_height = num_of_chars if num_of_chars > row_height else row_height  
+                if(type(df.iloc[col1 + i,j]) == str):
+                    num_of_chars = len(df.iloc[col1 + i,j]) / 14
+                    row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]  
                 
                 # If the corresponding highlight indicator is true
                 if df_highlight.iloc[col1 + i, 0] == True:
@@ -341,7 +340,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
                         # Use the format corresponding to the non-highlighting data
                         text_format2)
             # Will adjust row height if contents of row are longer than cell
-            worksheet.set_row(i + 4, 11.25 * row_height if row_height % 1 == 0 else 11.25 * math.ceil(row_height))
+            worksheet.set_row(i + 4, 11.25 * row_height[i] if row_height[i] % 1 == 0 else 11.25 * math.ceil(row_height[i]))
 
     # Set print scale to 80%
     worksheet.set_print_scale(80)

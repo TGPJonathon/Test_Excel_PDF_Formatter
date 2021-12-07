@@ -39,20 +39,20 @@ def before_first_request_func():
 ##################################################################
 
   # # Check to see if Java is installed
-  # is_java_installed = False
+  is_java_installed = False
 
   # # Will iterate through immediate directory to check
-  # for dir in os.listdir():
-  #   if(dir.startswith("jdk")):
-  #     is_java_installed = True
+  for dir in os.listdir():
+    if(dir.startswith("jdk")):
+      is_java_installed = True
 
   # # If not there, install it
-  # if(not is_java_installed):
-  #   jdk.install('11', path="./")
+  if(not is_java_installed):
+    jdk.install('11', path="./")
 
   # print(is_java_installed)
   #Set location of Java installation
-  # os.environ["JAVA_HOME"] = "./"
+  os.environ["JAVA_HOME"] = "./"
 
 #####################################################
 #      End Java Install / Local Testing

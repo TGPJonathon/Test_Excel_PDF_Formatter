@@ -41,10 +41,12 @@ spec:
               scheme: HTTPS
               path: /healthz/live
               port: 5000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 600
+            periodSeconds: 60
           readinessProbe:
             httpGet:
               scheme: HTTPS
               path: /healthz/ready
               port: 5000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 600
+            periodSeconds: 60
