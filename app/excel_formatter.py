@@ -160,6 +160,11 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
 
     # Traverse the columns and associated indices
     for idx, col_name in enumerate(df.columns):
+
+        #Change Column Name so we can shorten column width
+        if(col_name == "Final Destination Count"):
+            col_name = "Final Dest Count"
+
         worksheet.write(
             # All column headers are in row 3
             3,
@@ -182,6 +187,11 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         
         # Again, traverse the columns and associated indices
         for idx, col_name in enumerate(df.columns):
+
+            #Change Column Name so we can shorten column width
+            if(col_name == "Final Destination Count"):
+                col_name = "Final Dest Count"
+
             worksheet.write(
                 # All column headers are in row 3
                 3,
@@ -241,17 +251,16 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         'bottom':1,
         'border_color': '#000000'}) 
 
-    # Write in the actual data
-    # Traverse each row in the first column
-
     # Array used to check if the row height needs to be changed
     row_height = [1]
 
+    # Write in the actual data
+    # Traverse each row in the first column
     for i in range(0, col1):
 
+        # Will adjust second column row height based on first column's height
         row_height.append(1)
 
-        # Initialized value, will be multiplied by 11.25 depending on how wide cell content is
         
         # Traverse each column of data
         for j in range(0, len(df.columns)):
@@ -259,7 +268,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             # Will check to see if contents of a cell are longer than it's width
             # Row height will later be adjusted depending on how long the text is
             if(type(df.iloc[i,j]) == str):
-                num_of_chars = len(df.iloc[i,j]) / 14
+                num_of_chars = len(df.iloc[i,j]) / 20
                 row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]     
             
             # If the corresponding highlight indicator is true
@@ -305,7 +314,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             # Traverse each column of data
             for j in range(0, len(df.columns)):
                 if(type(df.iloc[col1 + i,j]) == str):
-                    num_of_chars = len(df.iloc[col1 + i,j]) / 14
+                    num_of_chars = len(df.iloc[col1 + i,j]) / 20
                     row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]  
                 
                 # If the corresponding highlight indicator is true
