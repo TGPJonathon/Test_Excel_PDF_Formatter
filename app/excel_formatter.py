@@ -18,7 +18,7 @@ from io import BytesIO
 # Read in the data
 ###############################################################################
 
-def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_title, pdf):
+def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_title, date_range, pdf):
 
     # If user wants an excel sheet, initialize the Binary object to write to
     if(not pdf):
@@ -126,7 +126,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         'valign': 'bottom',
         'align':'left'})
 
-    # Write the title
+    # Write the title & date range
     worksheet.merge_range(
         
         # Merge rows 1 to 1
@@ -136,7 +136,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         1, 11,
         
         # Write the title text
-        excel_sheet_title,
+        f"{excel_sheet_title}: {date_range[0]} - {date_range[1]}",
         
         # Use the title format
         title_format)
@@ -164,6 +164,10 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
         #Change Column Name so we can shorten column width
         if(col_name == "Final Destination Count"):
             col_name = "Final Dest Count"
+        if(col_name == "Leg 1 Destinations"):
+            col_name = "Leg 1 Dest."
+        if(col_name == "Final Destinations"):
+            col_name = "Final Dest."
 
         worksheet.write(
             # All column headers are in row 3
@@ -191,6 +195,10 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             #Change Column Name so we can shorten column width
             if(col_name == "Final Destination Count"):
                 col_name = "Final Dest Count"
+            if(col_name == "Leg 1 Destinations"):
+                col_name = "Leg 1 Dest."
+            if(col_name == "Final Destinations"):
+                col_name = "Final Dest."
 
             worksheet.write(
                 # All column headers are in row 3
@@ -268,7 +276,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             # Will check to see if contents of a cell are longer than it's width
             # Row height will later be adjusted depending on how long the text is
             if(type(df.iloc[i,j]) == str):
-                num_of_chars = len(df.iloc[i,j]) / 20
+                num_of_chars = len(df.iloc[i,j]) / 30
                 row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]     
             
             # If the corresponding highlight indicator is true
@@ -314,7 +322,7 @@ def make_excel_sheet(title, excel_data, highlight, column_widths, excel_sheet_ti
             # Traverse each column of data
             for j in range(0, len(df.columns)):
                 if(type(df.iloc[col1 + i,j]) == str):
-                    num_of_chars = len(df.iloc[col1 + i,j]) / 20
+                    num_of_chars = len(df.iloc[col1 + i,j]) / 30
                     row_height[i] = num_of_chars if num_of_chars > row_height[i] else row_height[i]  
                 
                 # If the corresponding highlight indicator is true

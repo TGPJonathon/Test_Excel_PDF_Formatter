@@ -78,9 +78,10 @@ def send_excel():
     highlight_rows = request.get_json().get('excelFormattingParameters')[0]['highlight']
     column_widths = request.get_json().get('excelFormattingParameters')[0]['widths']
     excel_sheet_title = request.get_json().get('excelFormattingParameters')[0]['excelTitle']
+    date_range = request.get_json().get('excelFormattingParameters')[0]['dateRange']
     pdf_or_no = request.get_json().get('excelFormattingParameters')[0]['pdf']
 
-    output = make_excel_sheet(g.get('title'), excel_data, highlight_rows, column_widths, excel_sheet_title, pdf_or_no)
+    output = make_excel_sheet(g.get('title'), excel_data, highlight_rows, column_widths, excel_sheet_title, date_range, pdf_or_no)
 
 
   # If the user wants a PDF the make_excel_sheet function will return 0 as a value
@@ -131,4 +132,4 @@ app.config.update(
   
 
 if __name__ == '__main__':
-  app.run(host="0.0.0.0", ssl_context="adhoc")
+  app.run(host="0.0.0.0", ssl_context='adhoc')
